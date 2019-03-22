@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'src/article.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(MyApp());
 
@@ -40,12 +41,22 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _build(article){
+  Widget _build(thisArticle){
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: new Text(
-        article.text,
-        style: TextStyle(fontSize: 24.0),
+      child: new ListTile(
+        title: new Text(
+          thisArticle.text,
+          style: TextStyle(fontSize: 24.0),
+        ),
+        subtitle: new Text('${thisArticle.commentsCount} comments'),
+
+        onTap: () async {
+          final fakeUrl = "http://${thisArticle.domain}";
+          if(await canLaunch(fakeUrl))
+            await launch(fakeUrl);
+
+        },
       ),
     );
   }
