@@ -26,37 +26,55 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   List<Article> _article = articles;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: new ListView(
-        children: _article.map(_build).toList(),
-      )  // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: new RefreshIndicator(
+          onRefresh: () async{
+            await new Future.delayed(const Duration(seconds: 1));
+            setState(() {
+              _article.removeAt(0);
+            });
+            return null;
+          },
+          child: new ListView(
+            children: _article.map(_build).toList(),
+          ),
+        ) // This trailing comma makes auto-formatting nicer for build methods.
+        );
   }
 
-  Widget _build(thisArticle){
+  Widget _build(thisArticle) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: new ListTile(
+      child: new ExpansionTile(
         title: new Text(
           thisArticle.text,
           style: TextStyle(fontSize: 24.0),
         ),
-        subtitle: new Text('${thisArticle.commentsCount} comments'),
-
-        onTap: () async {
-          final fakeUrl = "http://${thisArticle.domain}";
-          if(await canLaunch(fakeUrl))
-            await launch(fakeUrl);
-
-        },
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              new Text('${thisArticle.commentsCount} comments',
+                  style: TextStyle(fontSize: 16.0)),
+              new IconButton(
+                  icon: new Icon(
+                    Icons.open_in_new,
+                    color: Colors.black54,
+                  ),
+                  onPressed: () async {
+                    final fakeUrl = "http://${thisArticle.domain}";
+                    if (await canLaunch(fakeUrl)) await launch(fakeUrl);
+                  })
+            ],
+          )
+        ],
       ),
     );
   }
